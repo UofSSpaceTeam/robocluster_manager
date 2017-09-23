@@ -4,6 +4,8 @@ import shlex
 import sys
 from subprocess import Popen
 from time import sleep
+import serial
+from serial.tools import list_ports
 
 class RoboProcess:
     """Manages and keeps track of a process."""
@@ -50,6 +52,13 @@ class RoboProcess:
         """Fix a process if its not running properly."""
         raise NotImplementedError()
 
+class SerialDevice:
+    """ Keeps track of information for USB devices"""
+
+    def __init__(self, list_port_info, owner):
+        self.list_port_info = list_port_info
+        self.owner = owner
+
 class ProcessManager:
     """
     Manages processes that run in the robocluster framework.
@@ -65,6 +74,8 @@ class ProcessManager:
     def __init__(self):
         """Initialize a process manager."""
         self.processes = {}  # store processes by name
+        self.devices = {}  # Keep track of USB devices, and who's using them
+        self.scanUSB()
 
     def __enter__(self):
         """Enter context manager."""
@@ -94,6 +105,22 @@ class ProcessManager:
             raise ValueError('command must be a string')
 
         self.processes[name] = RoboProcess(command)
+
+    def scanUSB(self):
+        """Scan for USB devices and"""
+        # TODO: Serial devices should provide a name to
+        # the ProcessManager for easy identification.
+        ports = list_ports.comports()
+        port_names = [port.device for port in ports]
+
+        # Store any new devices
+        for port in port_names:
+            if port not in self.devices:
+                self.devices[port] = SerialDevice(port, None)
+        # Check if a device got disconnected
+        for device in self.devices.keys():
+            if device not in port_names:
+                print("{} disconnected".format(device))
 
 
     def start(self, *names):
@@ -143,6 +170,8 @@ def main():
             while True:
                 # TODO: Verify processes.
                 sleep(1)
+                manager.scanUSB()
+                print(manager.devices)
         except KeyboardInterrupt:
             pass
 
