@@ -4,8 +4,8 @@ from ProcessManager import ProcessManager, RunOnce
 PATH = './examples/demo'
 
 process_list = [
-    RunOnce("random-stream", 'python {}.format/random_stream.py'.format(PATH)),
-    RunOnce("printer", 'python {}.format/printer.py'.format(PATH)),
+    RunOnce("random-stream", 'python {}/random_stream.py'.format(PATH)),
+    RunOnce("printer", 'python {}/printer.py'.format(PATH)),
     # RunOnce("serialtest", f'python {PATH}.format/serial_test.py'),
 ]
 
