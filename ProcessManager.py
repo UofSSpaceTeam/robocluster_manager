@@ -183,7 +183,7 @@ class ProcessManager:
                 pass
 
     @staticmethod
-    def run(self):
+    def run():
         """Run the event loop"""
         loop = asyncio.get_event_loop()
         loop.run_forever()
